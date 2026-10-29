@@ -33,7 +33,7 @@
     {#each groups as g (g.problem)}
       <tr class:open={!issues[g.problem]}>
         <td><code>{g.problem}</code></td>
-        <td>{g.reports.length}</td>
+        <td>{g.reports.length}{#if g.alsoIn}<span class="small"> (also in <code>{g.alsoIn}</code>)</span>{/if}</td>
         <td class="small">{channels(g)}</td>
         <td>{g.tenants}</td>
         <td class="small">{g.firstSeen} → {g.lastSeen}</td>

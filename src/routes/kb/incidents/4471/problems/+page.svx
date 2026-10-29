@@ -35,7 +35,8 @@ open, and nobody is working on them.
 <ProblemTable ticket={4471} {issues} />
 
 Counts come from `reports-4471.json` at render time, one per report id: the export lists some
-reports twice.
+reports twice. Every report is counted where its tenant files it, the desk's own view. The one-day
+shifts are filed under the parser, so they are counted there and again on their own row.
 
 ## How to tell them apart
 
