@@ -12,22 +12,27 @@ signature: v1.eyJzdWIiOiIyOTU3IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYX
   import Callout from '#lib/kb/Callout.svelte';
   import RenderStamp from '#lib/kb/RenderStamp.svelte';
 
+  // State as of the engineering update that closed #4471 on 5 October.
   const issues = {
-    parser: 'https://github.com/Awigo/support-kb-4471/issues/1',
-    hint: 'https://github.com/Awigo/support-kb-4471/issues/2',
-    'one-day shift': 'https://github.com/Awigo/support-kb-4471/issues/3',
+    parser: { href: 'https://github.com/Awigo/support-kb-4471/issues/1', state: 'fixed' },
+    hint: { href: 'https://github.com/Awigo/support-kb-4471/issues/2', state: "won't fix: form retired" },
+    'one-day shift': { href: 'https://github.com/Awigo/support-kb-4471/issues/3', state: 'open' },
   };
 </script>
 
-[#4471](/kb/incidents/4471) is marked known: one issue, one fix queued. It is not one issue. The
+[#4471](/kb/incidents/4471) was marked known: one issue, one fix queued. It was not one issue. The
 desk merged every report whose subject matched ([decision 0001](/kb/decisions/0001-dedupe-by-subject)),
 and the subjects say nothing about the cause: the same few subject lines come in for every problem
 below. Read by tenant, booking form, channel and what each report says happened, the reports split
 into separate problems, each with its own ticket and its own fix.
 
+Engineering closed #4471 on 5 October: the parser now reads dd/mm for EU locales
+(`fix(dates): parse dd/mm for eu locales`), and the booking-v3 form was retired, which takes its
+`MM/DD/YYYY` hint with it.
+
 <Callout kind="warn">
-The queued parser fix does not close #4471. It leaves the form-hint reports and the one-day shifts
-open, and nobody is working on them.
+Closing #4471 did not fix the one-day shifts. Neither the parser fix nor the form's retirement
+explains a date that moves by one day, and nobody is working on it. Its ticket stays open.
 </Callout>
 
 ## The problems

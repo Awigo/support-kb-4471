@@ -5,12 +5,14 @@
   import { groupByProblem, type Problem } from '#lib/kb/problems';
   import { tenantOf } from '#lib/kb/locales';
 
-  // `issues`: the ticket filed for each problem, problem → link.
-  let { ticket, issues = {} }: { ticket: number; issues?: Partial<Record<Problem, string>> } = $props();
+  // `issues`: the ticket filed for each problem, problem → its link and its state.
+  type Filed = { href: string; state: string };
+  let { ticket, issues = {} }: { ticket: number; issues?: Partial<Record<Problem, Filed>> } = $props();
 
   const rows = $derived(reports as Report[]);
   const merged = $derived(uniqueById(rows).filter((r) => r.mergedInto === ticket));
   const groups = $derived(groupByProblem(merged, tenantOf, notes.oneDayMove));
+  const label = (href: string) => href.replace(/^.*\/([^/]+)\/issues\//, '$1#');
   const channels = (g: { channels: Record<string, number> }) =>
     Object.entries(g.channels)
       .sort((a, b) => b[1] - a[1])
@@ -27,17 +29,19 @@
 
 <table>
   <thead>
-    <tr><th>problem</th><th>reports</th><th>channels</th><th>tenants</th><th>seen</th><th>ticket</th></tr>
+    <tr><th>problem</th><th>reports</th><th>channels</th><th>tenants</th><th>seen</th><th>ticket</th><th>state</th></tr>
   </thead>
   <tbody>
     {#each groups as g (g.problem)}
-      <tr class:open={!issues[g.problem]}>
+      {@const filed = issues[g.problem]}
+      <tr class:open={!filed || filed.state === 'open'}>
         <td><code>{g.problem}</code></td>
         <td>{g.reports.length}{#if g.alsoIn}<span class="small"> (also in <code>{g.alsoIn}</code>)</span>{/if}</td>
         <td class="small">{channels(g)}</td>
         <td>{g.tenants}</td>
         <td class="small">{g.firstSeen} → {g.lastSeen}</td>
-        <td>{#if issues[g.problem]}<a href={issues[g.problem]}>{issues[g.problem]?.replace(/^.*\/([^/]+)\/issues\//, '$1#')}</a>{:else}no ticket yet{/if}</td>
+        <td>{#if filed}<a href={filed.href}>{label(filed.href)}</a>{:else}no ticket yet{/if}</td>
+        <td>{filed?.state ?? 'open'}</td>
       </tr>
     {/each}
   </tbody>
