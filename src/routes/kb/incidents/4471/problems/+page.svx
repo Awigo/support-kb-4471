@@ -1,0 +1,64 @@
+---
+layout: runbook
+title: '#4471 · what the merged reports really hold'
+owner: Awigo
+status: open
+reviewed: 2026-10-29
+signature: v1.eyJzdWIiOiIyOTU3IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTMyNzI4NTcsImV4cCI6MTc5MzM1OTI1N30.PoGh1YA8WZUbASU7e8JUfGaY5phs7yZQVVNCKQcF1GQ
+---
+
+<script>
+  import ProblemTable from '#lib/kb/ProblemTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+
+  const issues = {
+    parser: 'https://github.com/Awigo/support-kb-4471/issues/1',
+    hint: 'https://github.com/Awigo/support-kb-4471/issues/2',
+    'one-day shift': 'https://github.com/Awigo/support-kb-4471/issues/3',
+  };
+</script>
+
+[#4471](/kb/incidents/4471) is marked known: one issue, one fix queued. It is not one issue. The
+desk merged every report whose subject matched ([decision 0001](/kb/decisions/0001-dedupe-by-subject)),
+and the subjects say nothing about the cause: the same few subject lines come in for every problem
+below. Read by tenant, booking form, channel and what each report says happened, the reports split
+into separate problems, each with its own ticket and its own fix.
+
+<Callout kind="warn">
+The queued parser fix does not close #4471. It leaves the form-hint reports and the one-day shifts
+open, and nobody is working on them.
+</Callout>
+
+## The problems
+
+<ProblemTable ticket={4471} {issues} />
+
+Counts come from `reports-4471.json` at render time, one per report id: the export lists some
+reports twice.
+
+## How to tell them apart
+
+- **`parser`**: day and month swapped (booked 4 July, invite says 7 April). Through the app, email,
+  or the booking-v2 form, which tells people to type the day first. The shared parser reads every
+  date month first. Fix: parse in the tenant's locale order.
+- **`hint`**: the same swap, but only through the **booking-v3 form** of a day-first tenant. That form
+  prints `MM/DD/YYYY` under its date field; people type what it says, and the form reads it day
+  first. Fixing the parser does not fix this one. Fix: print the hint in the tenant's order.
+- **`one-day shift`**: the date moves by one day, not a swap (12 May shows as 11 May; Lisbon gets
+  Tuesday, Toronto gets Monday). The desk had already noted these as a one-day move
+  (`desk-notes.json`) but filed them under the parser. Most likely a time zone conversion; not
+  confirmed.
+- **`unplaced`** (only shown when there are any): a tenant not on file, so the locale and form are
+  unknown. Read the report before filing it.
+
+The intake tag on a report is a guess from the reporter's browser, not the cause. It disagrees with
+the tenant's cause often enough that it should not be used to sort these reports.
+
+## What the desk should change
+
+- Merge by cause, not by subject. The [dedupe explorer](/kb/triage/dedupe) already shows the
+  difference: the same subject can be two causes, and two subjects can be one.
+- Before marking a big ticket known, read a handful of bodies from each tenant and each channel.
+
+<RenderStamp {signature} />
